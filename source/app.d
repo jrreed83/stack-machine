@@ -3,61 +3,70 @@ import stackmachine.tokens;
 import stackmachine.lexer;
 import stackmachine.stack;
 
-enum Code: ulong {
-    I_ADD   = 0, 
-    I_SUB   = 1,
-    I_MUL   = 2,
-    F_ADD   = 3,
-    F_SUB   = 4,
-    F_MUL   = 5,
-    I_CONST = 6,
-    HALT    = 7,
-    NULL    = 8,
-	PRINT   = 9,
-	NO_OP   = 10,
+enum Code: ubyte {
+    IADD    = 0, 
+    ISUB    = 1,
+    IMUL    = 2,
+	ICONST  = 3,
+	ICONST0 = 4,
+	ICONST1 = 5,
+	ICONST2 = 6,
+    FADD    = 7,
+    FSUB    = 8,
+    FMUL    = 9,
+	FCONST  = 10,
+	SCONST  = 11,
+    HALT    = 12,
+    NULL    = 13,
+	PRINT   = 14,
+	NO_OP   = 15,
 };
 
-void execute(Stack stack, ulong[] code) {
+void execute(Stack stack, ubyte[] code) {
 	int ip = 0;
 	bool run = true;
 	
-	while (run) {
+	auto byte_code = code[ip];
 
-		ulong x = code[ip];
-
-		switch (x) {
+	while (ip < code.length && byte_code != Code.HALT) {
+		ip += 1;
+		switch (byte_code) {
 			case Code.NO_OP:
-				ip++;
-				writeln("NO_OP");
 				break;
-			case Code.I_CONST:
-				ip++;
-				writeln("CONST");				
-				stack.push(code[ip]);
-				ip++;
+			case Code.ICONST:
+				ulong x = (code[ip] << 24) | (code[ip+1] << 16) | (code [ip+2] << 8) | code[ip+3];				
+				stack.push(x);
+				ip += 4;
 				break;
-			case Code.I_ADD:
+			case Code.ICONST0:			
+				stack.push(0);
+				break;	
+			case Code.ICONST1:			
+				stack.push(1);
+				break;	
+			case Code.ICONST2:			
+				stack.push(2);
+				break;												
+			case Code.IADD:
 				auto a = stack.pop();
 				auto b = stack.pop();
 				auto c = a + b;
 				stack.push(c);
-				ip++;
 				break;
-			case Code.HALT:
-				ip++;
-				writeln("HALT");
-				run = false;
-				break;
+			case Code.IMUL:
+				auto a = stack.pop();
+				auto b = stack.pop();
+				auto c = a * b;
+				stack.push(c);
+				break;				
 			case Code.PRINT:
-				ip++;
 				writeln(stack.peek());
 				break;
 			default:
-				writeln("OH NO");
-				run = false;
 				break;
-			
 		}
+		// Get next byte code
+		byte_code = code[ip];
 	}	
 }
 
@@ -65,16 +74,12 @@ void main()
 {
 
 	Stack s = new Stack();
-	ulong[] i = [
-		cast(ulong) Code.NO_OP, 
-		cast(ulong) Code.NO_OP,
-		cast(ulong) Code.I_CONST,
-		10,
-		cast(ulong) Code.I_CONST,
-		20,
-		cast(ulong) Code.I_ADD,
-		cast(ulong) Code.PRINT,
-		cast(ulong) Code.HALT];
+	ubyte[] i = [
+		cast(ubyte) Code.ICONST2,
+		cast(ubyte) Code.ICONST2,
+		cast(ubyte) Code.IADD,
+		cast(ubyte) Code.PRINT,
+		cast(ubyte) Code.HALT];
 
 	execute(s, i);
 
