@@ -1,22 +1,27 @@
 module stackmachine.lexer;
 import stackmachine.tokens; 
 
-struct Lexer {
+class Lexer {
     string input;
-    char peek;
-    int ptr;    
+    uint   ptr;
 
-}
+    this (string input) {
+        this.input = input;
+        this.ptr   = 0;
+    }
 
-Lexer startLexer (string input) {
-    Lexer l = {input: input, peek: input[0], ptr: 0};
-    return l;
-}
+    bool match(string x) {
+        uint n = x.length;
+        uint a = this.ptr;
+        bool matched = x == this.input[a..a+n];
+        if (matched) {
+            this.ptr += n;
+        }
+        return matched; 
+    }
 
-Token step(ref Lexer l) {
-    l.ptr = l.ptr + 1;
-    l.peek = l.input[l.ptr];
-    Token tok = {value: "3", tag: Tag.NUMBER};
-    return tok;
+    Token nextToken() {
+        // Go through until we get the next Token
+    }
 }
 

@@ -83,4 +83,11 @@ void main()
 
 	execute(s, i);
 
+	auto t1 = Token("a", Tag.IADD);
+	auto t2 = Token("a", Tag.IADD);
+
+	Lexer lex = new Lexer("iconst 6");
+	writeln(lex.match("iconst"));
+	writeln(lex.match(" "));
+	writeln(lex.match("6"));
 }
