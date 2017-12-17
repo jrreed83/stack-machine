@@ -9,10 +9,16 @@ enum Tag {
     FADD,
     FSUB,
     FMUL,
-    HALT
+    HALT,
+    PRINT,
+    NUMBER,
+    WORD,
+    NIL,
 };
 
 struct Token {
     string text; 
-    Tag    tag;   
+    Tag    tag;  
 }
+
+

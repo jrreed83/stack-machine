@@ -2,6 +2,7 @@ import std.stdio;
 import stackmachine.tokens;
 import stackmachine.lexer;
 import stackmachine.stack;
+import std.ascii; 
 
 enum Code: ubyte {
     IADD    = 0, 
@@ -21,6 +22,7 @@ enum Code: ubyte {
 	PRINT   = 14,
 	NO_OP   = 15,
 };
+
 
 void execute(Stack stack, ubyte[] code) {
 	int ip = 0;
@@ -83,11 +85,15 @@ void main()
 
 	execute(s, i);
 
-	auto t1 = Token("a", Tag.IADD);
-	auto t2 = Token("a", Tag.IADD);
 
-	Lexer lex = new Lexer("iconst 6");
-	writeln(lex.match("iconst"));
-	writeln(lex.match(" "));
-	writeln(lex.match("6"));
+	Lexer lex = new Lexer("iconst 43 \n iconst 40 \n iadd \n print ");
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());
+	writeln(lex.nextToken());	
+
 }
