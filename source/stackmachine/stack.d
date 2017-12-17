@@ -1,27 +1,29 @@
 module stackmachine.stack;
 
+
+
 class Stack {
     ulong[256] data;
-    ubyte ptr;
+    int head;
 
-    this() {
-        this.ptr = 0;
+    this () {
+        this.head = 0;
     }
 
-    ubyte push(ulong x) {
-        this.ptr++;
-        this.data[this.ptr] = x;
-        return this.ptr;
+    int push(ulong x) {
+        this.head++;
+        this.data[this.head] = x;
+        return this.head;
     }
 
     ulong pop() {
-        auto x = this.data[this.ptr];
-        this.ptr--;
+        auto x = this.data[this.head];
+        this.head--;
         return x;
     }
 
     ulong peek() {
-        return this.data[this.ptr];        
+        return this.data[this.head];        
     }
 
     
