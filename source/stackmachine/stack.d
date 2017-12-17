@@ -1,7 +1,5 @@
 module stackmachine.stack;
 
-
-
 class Stack {
     ulong[256] data;
     int head;
