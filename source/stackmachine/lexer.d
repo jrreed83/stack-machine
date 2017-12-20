@@ -4,75 +4,83 @@ import std.ascii;
 import std.string;
 import std.stdio;
 
+enum State {
+    Keyword,
+    Constant
+}
+
 class Lexer {
-    string        input;
-    uint          ptr;
-    Token[string] keyWords;
+    string input;
+    uint   curr_pos;
+    State  curr_state;
 
     this (string input) {
-        this.input = input;
-        this.ptr   = 0;
+        this.input    = input;
+        this.curr_pos = 0;
+        this.curr_state = State.Keyword;
+    }
 
-        // Add keywords
-        this.keyWords["iconst"] = Token("iconst", Tag.ICONST);
-        this.keyWords["iadd"  ] = Token("iadd",   Tag.IADD);
-        this.keyWords["isub"  ] = Token("isub",   Tag.ISUB);        
-        this.keyWords["print" ] = Token("print",  Tag.PRINT);
-        this.keyWords["halt"  ] = Token("halt",   Tag.HALT);
+    char currChar() {
+        return this.input[this.curr_pos];
+    }
+
+    char look(uint i) {
+        return this.input[this.curr_pos+i];
+    }
+
+    void consume() {
+        this.curr_pos++;
+    }
+
+    void reverse() {
+        this.curr_pos--;
     }
 
     Token nextToken() {
-        Token tok;
+        Token tok; 
 
-        bool found = false;
+        auto curr = this.currChar();
 
-        if (this.ptr == this.input.length) {
-            return Token("", Tag.NIL);
-        }   
-        while (!found && this.ptr < this.input.length) {
-            // Go through until we get the next Token
-            char peek = this.input[this.ptr];
+        // Skip non-important characters 
+        if (isWhite(curr)) {
+            int stride = 0;
+            do {
+                stride++;
+            } while (isWhite(this.look(stride)));
+            this.curr_pos += stride;            
+        }
 
-            if (isDigit (peek)) {
-                tok = numberTok(this.input[this.ptr .. $]);       
-                found = true; 
-                this.ptr += tok.text.length;
-            } else if (isWhite (peek)) {
-                this.ptr += 1;
-            } else if (isAlpha (peek)) {
-                tok = wordToken(this.input[this.ptr .. $], this.keyWords);
-                found = true;
-                this.ptr += tok.text.length;
-            }
+        curr = this.currChar();
+        switch (curr) {      
+            case 'a': .. case 'z':
+                int stride = 0;
+                do {
+                    stride++;
+                } while (isAlpha(this.look(stride)) && (this.curr_pos + stride) < input.length);
+
+                auto txt = this.input[this.curr_pos .. this.curr_pos + stride];
+                tok = Token(txt, Tag.NUMBER);
+                this.curr_pos += stride;                
+                break;
+            case '0': .. case '9':
+                int stride = 0;
+                do {
+                    stride++;
+                } while (isDigit(this.look(stride)) && (this.curr_pos + stride) < input.length);
+
+                auto txt = this.input[this.curr_pos .. this.curr_pos + stride];
+                tok = Token(txt, Tag.NUMBER);  
+                this.curr_pos += stride;                             
+                break;            
+            default:
+                auto txt = " ";
+                tok = Token(txt, Tag.NUMBER);              
+                break;
         }
         return tok;
     }
 
 }
 
-Token wordToken(string input, Token[string] keyWords) {
-    auto stop = 0;
-    char peek = input[0];
-    while (isAlpha(peek) && stop < input.length) {
-        peek = input[stop++];
-    }      
-    string word = input[0 .. stop-1];
 
-    if (word in keyWords) {
-        return keyWords[word];
-    } else {
-        return Token(word, Tag.WORD);
-    }
-    
-}
-
-Token numberTok(string input) {
-    // Extract the number portion of the input string
-    auto stop = 0;
-    char peek = input[0];
-    while (isDigit(peek) && stop < input.length) {
-        peek = input[stop++];
-    }  
-    return Token(input[0 .. stop-1], Tag.NUMBER);    
-}
 

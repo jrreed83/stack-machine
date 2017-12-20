@@ -4,7 +4,7 @@ import stackmachine.lexer;
 import stackmachine.stack;
 import std.ascii; 
 
-enum Code: ubyte {
+enum OpCode: ubyte {
     IADD    = 0, 
     ISUB    = 1,
     IMUL    = 2,
@@ -30,38 +30,38 @@ void execute(Stack stack, ubyte[] code) {
 	
 	auto byte_code = code[ip];
 
-	while (ip < code.length && byte_code != Code.HALT) {
+	while (ip < code.length && byte_code != OpCode.HALT) {
 		ip += 1;
 		switch (byte_code) {
-			case Code.NO_OP:
+			case OpCode.NO_OP:
 				break;
-			case Code.ICONST:
+			case OpCode.ICONST:
 				ulong x = (code[ip] << 24) | (code[ip+1] << 16) | (code [ip+2] << 8) | code[ip+3];				
 				stack.push(x);
 				ip += 4;
 				break;
-			case Code.ICONST0:			
+			case OpCode.ICONST0:			
 				stack.push(0);
 				break;	
-			case Code.ICONST1:			
+			case OpCode.ICONST1:			
 				stack.push(1);
 				break;	
-			case Code.ICONST2:			
+			case OpCode.ICONST2:			
 				stack.push(2);
 				break;												
-			case Code.IADD:
+			case OpCode.IADD:
 				auto a = stack.pop();
 				auto b = stack.pop();
 				auto c = a + b;
 				stack.push(c);
 				break;
-			case Code.IMUL:
+			case OpCode.IMUL:
 				auto a = stack.pop();
 				auto b = stack.pop();
 				auto c = a * b;
 				stack.push(c);
 				break;				
-			case Code.PRINT:
+			case OpCode.PRINT:
 				writeln(stack.peek());
 				break;
 			default:
@@ -70,6 +70,7 @@ void execute(Stack stack, ubyte[] code) {
 		// Get next byte code
 		byte_code = code[ip];
 	}	
+
 }
 
 void main()
@@ -77,23 +78,18 @@ void main()
 
 	Stack s = new Stack();
 	ubyte[] i = [
-		cast(ubyte) Code.ICONST2,
-		cast(ubyte) Code.ICONST2,
-		cast(ubyte) Code.IADD,
-		cast(ubyte) Code.PRINT,
-		cast(ubyte) Code.HALT];
+		cast(ubyte) OpCode.ICONST2,
+		cast(ubyte) OpCode.ICONST2,
+		cast(ubyte) OpCode.IADD,
+		cast(ubyte) OpCode.PRINT,
+		cast(ubyte) OpCode.HALT];
 
 	execute(s, i);
 
 
-	Lexer lex = new Lexer("iconst 43 \n iconst 40 \n iadd \n print ");
+	string line ="iconst          64467;"; 
+	Lexer lex = new Lexer(line);
 	writeln(lex.nextToken());
 	writeln(lex.nextToken());
-	writeln(lex.nextToken());
-	writeln(lex.nextToken());
-	writeln(lex.nextToken());
-	writeln(lex.nextToken());
-	writeln(lex.nextToken());
-	writeln(lex.nextToken());	
 
 }
