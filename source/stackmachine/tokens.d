@@ -14,6 +14,7 @@ enum Tag {
     NUMBER,
     WORD,
     NIL,
+    EOL,
 };
 
 struct Token {

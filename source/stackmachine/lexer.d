@@ -39,43 +39,47 @@ class Lexer {
     Token nextToken() {
         Token tok; 
 
-        auto curr = this.currChar();
-
-        // Skip non-important characters 
-        if (isWhite(curr)) {
-            int stride = 0;
-            do {
-                stride++;
-            } while (isWhite(this.look(stride)));
-            this.curr_pos += stride;            
+        int idx = this.curr_pos;
+        while (idx < this.input.length) {
+            char curr_char = this.input[idx];
+            if (isWhite(curr_char)) {
+                idx++;
+            } else {
+                break;
+            }
         }
+        this.curr_pos = idx;
+        if (this.curr_pos == this.input.length) {
+            tok = Token("EOL", Tag.EOL);
+        } else {
 
-        curr = this.currChar();
-        switch (curr) {      
-            case 'a': .. case 'z':
-                int stride = 0;
-                do {
-                    stride++;
-                } while (isAlpha(this.look(stride)) && (this.curr_pos + stride) < input.length);
+            auto curr = this.currChar();
+            switch (curr) {      
+                case 'a': .. case 'z':
+                    int stride = 0;
+                    do {
+                        stride++;
+                    } while (isAlpha(this.look(stride)));
 
-                auto txt = this.input[this.curr_pos .. this.curr_pos + stride];
-                tok = Token(txt, Tag.NUMBER);
-                this.curr_pos += stride;                
-                break;
-            case '0': .. case '9':
-                int stride = 0;
-                do {
-                    stride++;
-                } while (isDigit(this.look(stride)) && (this.curr_pos + stride) < input.length);
+                    auto txt = this.input[this.curr_pos .. this.curr_pos + stride];
+                    tok = Token(txt, Tag.NUMBER);
+                    this.curr_pos += stride;                
+                    break;
+                case '0': .. case '9':
+                    int stride = 0;
+                    do {
+                        stride++;
+                    } while (isDigit(this.look(stride)));
 
-                auto txt = this.input[this.curr_pos .. this.curr_pos + stride];
-                tok = Token(txt, Tag.NUMBER);  
-                this.curr_pos += stride;                             
-                break;            
-            default:
-                auto txt = " ";
-                tok = Token(txt, Tag.NUMBER);              
-                break;
+                    auto txt = this.input[this.curr_pos .. this.curr_pos + stride];
+                    tok = Token(txt, Tag.NUMBER);  
+                    this.curr_pos += stride;                             
+                    break;            
+                default:
+                    auto txt = " ";
+                    tok = Token(txt, Tag.NUMBER);              
+                    break;
+            }
         }
         return tok;
     }

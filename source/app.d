@@ -50,16 +50,10 @@ void execute(Stack stack, ubyte[] code) {
 				stack.push(2);
 				break;												
 			case OpCode.IADD:
-				auto a = stack.pop();
-				auto b = stack.pop();
-				auto c = a + b;
-				stack.push(c);
+				stack.push(stack.pop()+stack.pop());
 				break;
 			case OpCode.IMUL:
-				auto a = stack.pop();
-				auto b = stack.pop();
-				auto c = a * b;
-				stack.push(c);
+				stack.push(stack.pop()*stack.pop());
 				break;				
 			case OpCode.PRINT:
 				writeln(stack.peek());
@@ -87,9 +81,10 @@ void main()
 	execute(s, i);
 
 
-	string line ="iconst          64467;"; 
+	string line ="iconst 64467\n"; 
 	Lexer lex = new Lexer(line);
 	writeln(lex.nextToken());
 	writeln(lex.nextToken());
+	writeln(lex.nextToken());	
 
 }
